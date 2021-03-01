@@ -24,27 +24,9 @@ public class RNConnectivityStatusModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
 
-    private final static String RN_CONNECTIVITY_STATUS_TOPIC = "RNConnectivityStatus";
-    private final static String EVENT_TYPE = "eventType";
-    private final static String EVENT_STATUS = "status";
-
     // Location permission status
-    private static final String PERMISSION_LOCATION_GRANTED = "Location.Permission.Granted.Always";
-    private static final String PERMISSION_LOCATION_DENIED = "Location.Permission.Denied";
-
-    private final BroadcastReceiver mLocationReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final boolean locationEnabled = intent.getAction() != null
-                    && intent.getAction().matches(LocationManager.PROVIDERS_CHANGED_ACTION)
-                    && checkLocationServices();
-
-            final WritableMap eventMap = new WritableNativeMap();
-            eventMap.putString(EVENT_TYPE, "location");
-            eventMap.putBoolean(EVENT_STATUS, locationEnabled);
-            getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(RN_CONNECTIVITY_STATUS_TOPIC, eventMap);
-        }
-    };
+    private static final String PERMISSION_LOCATION_GRANTED = "always";
+    private static final String PERMISSION_LOCATION_DENIED = "denied";
 
     public RNConnectivityStatusModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -65,15 +47,6 @@ public class RNConnectivityStatusModule extends ReactContextBaseJavaModule {
                 put("LocationDenied", PERMISSION_LOCATION_DENIED);
             }
         });
-    }
-
-    @Override
-    public void initialize() {
-        super.initialize();
-
-        final IntentFilter locationFilter = new IntentFilter();
-        locationFilter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
-        reactContext.getApplicationContext().registerReceiver(mLocationReceiver, locationFilter);
     }
 
     @ReactMethod
@@ -105,6 +78,6 @@ public class RNConnectivityStatusModule extends ReactContextBaseJavaModule {
     }
 
     private boolean checkLocationPermission() {
-        return ContextCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(getReactApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 }

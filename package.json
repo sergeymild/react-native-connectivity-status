@@ -1,15 +1,8 @@
 {
   "name": "react-native-connectivity-status",
   "version": "1.5.2",
-  "description": "A ReactNative module to check Bluetooth and Location status on Android and iOS",
-  "author": {
-    "name": "Mattia Panzeri",
-    "email": "mattia.panzeri93@gmail.com",
-    "url": "https://github.com/panz3r"
-  },
-  "contributors": [
-    "Federico Boschini <federico@nearit.com>"
-  ],
+
+
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -26,10 +19,7 @@
     "bluetooth",
     "location"
   ],
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"No test specified\""
-  },
+  "main": "index.tsx",
   "peerDependencies": {
     "react-native": ">=0.41.2"
   }

@@ -9,20 +9,18 @@
 #import <Foundation/Foundation.h>
 #import "RNConnectivityStatus.h"
 
-#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+
 
 // Location permission status
-NSString* const RNCS_PERMISSION_LOCATION_GRANTED_ALWAYS = @"Location.Permission.Granted.Always";
-NSString* const RNCS_PERMISSION_LOCATION_GRANTED_WHEN_IN_USE = @"Location.Permission.Granted.WhenInUse";
-NSString* const RNCS_PERMISSION_LOCATION_DENIED = @"Location.Permission.Denied";
+NSString* const RNCS_PERMISSION_LOCATION_GRANTED_ALWAYS = @"always";
+NSString* const RNCS_PERMISSION_LOCATION_GRANTED_WHEN_IN_USE = @"whenInUse";
+NSString* const RNCS_PERMISSION_LOCATION_DENIED = @"denied";
 
-@implementation RNConnectivityStatus {
-  bool hasListeners;
-}
+@implementation RNConnectivityStatus
 
 - (dispatch_queue_t)methodQueue
 {
-  return dispatch_get_main_queue();
+    return dispatch_get_main_queue();
 }
 
 + (BOOL)requiresMainQueueSetup
@@ -32,68 +30,17 @@ NSString* const RNCS_PERMISSION_LOCATION_DENIED = @"Location.Permission.Denied";
 
 RCT_EXPORT_MODULE()
 
-- (instancetype) init
-{
-  self = [super init];
-  
-  if (self != nil) {
-    if(!locationManager) {
-      locationManager = [[CLLocationManager alloc] init];
-      locationManager.delegate = self;
-    }
-  }
-  
-  return self;
-}
-
 - (NSDictionary *)constantsToExport
 {
     return @{
-             @"Permissions": @{
-                     @"LocationGrantedAlways": RNCS_PERMISSION_LOCATION_GRANTED_ALWAYS,
-                     @"LocationGrantedWhenInUse": RNCS_PERMISSION_LOCATION_GRANTED_ALWAYS,
-                     @"LocationDenied": RNCS_PERMISSION_LOCATION_DENIED
-                     }
-             };
+        @"Permissions": @{
+                @"always": RNCS_PERMISSION_LOCATION_GRANTED_ALWAYS,
+                @"whenInUse": RNCS_PERMISSION_LOCATION_GRANTED_ALWAYS,
+                @"denied": RNCS_PERMISSION_LOCATION_DENIED
+        }
+    };
 }
 
-// MARK: RCTEventEmitter
-
-- (NSArray<NSString *> *)supportedEvents
-{
-  return @[
-           RN_CONNECTIVITY_STATUS_TOPIC
-         ];
-}
-
-// Will be called when this module's first listener is added.
-- (void)startObserving {
-  hasListeners = YES;
-
-  [self sendActiveState:CLLocationManager.locationServicesEnabled
-                forType:@"location"];
-
-  if (bluetoothManager) {
-    [self centralManagerDidUpdateState:bluetoothManager];
-  }
-}
-
-// Will be called when this module's last listener is removed, or on dealloc.
-- (void)stopObserving {
-  hasListeners = NO;
-}
-
-- (void)sendActiveState:(BOOL)state forType:(NSString* _Nonnull)eventType {
-  if (hasListeners) {
-      NSDictionary* event = @{
-                              EVENT_TYPE: eventType,
-                              EVENT_STATUS: @(state)
-                            };
-
-    [self sendEventWithName:RN_CONNECTIVITY_STATUS_TOPIC
-                       body:event];
-  }
-}
 
 // MARK: Location Permissions
 
@@ -130,15 +77,8 @@ RCT_EXPORT_METHOD(isLocationPermissionGranted:(RCTPromiseResolveBlock) resolve
 // MARK: Location Services
 
 RCT_EXPORT_METHOD(areLocationServicesEnabled:(RCTPromiseResolveBlock) resolve
-                           rejecter:(RCTPromiseRejectBlock) reject) {
+                  rejecter:(RCTPromiseRejectBlock) reject) {
     resolve(@(CLLocationManager.locationServicesEnabled));
-}
-
-// MARK: CLLocationManagerDelegate
-
-- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    [self sendActiveState:CLLocationManager.locationServicesEnabled
-                  forType:@"location"];
 }
 
 @end

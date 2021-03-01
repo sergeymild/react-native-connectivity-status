@@ -7,16 +7,11 @@
 //
 
 #import <React/RCTBridgeModule.h>
-#import <React/RCTEventEmitter.h>
 #import <React/RCTUtils.h>
 
 #import <CoreLocation/CoreLocation.h>
 
-@interface RNConnectivityStatus : RCTEventEmitter <RCTBridgeModule, CLLocationManagerDelegate, CBCentralManagerDelegate>
-
-#define RN_CONNECTIVITY_STATUS_TOPIC @"RNConnectivityStatus"
-#define EVENT_TYPE @"eventType"
-#define EVENT_STATUS @"status"
+@interface RNConnectivityStatus : NSObject <RCTBridgeModule>
 
 typedef NS_ENUM(NSInteger, LocationPermissionState) {
     LocationPermissionOff,
