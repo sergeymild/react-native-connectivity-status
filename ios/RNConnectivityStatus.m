@@ -18,8 +18,6 @@ NSString* const RNCS_PERMISSION_LOCATION_DENIED = @"Location.Permission.Denied";
 
 @implementation RNConnectivityStatus {
   bool hasListeners;
-  CLLocationManager *locationManager;
-  CBCentralManager *bluetoothManager;
 }
 
 - (dispatch_queue_t)methodQueue
@@ -42,14 +40,6 @@ RCT_EXPORT_MODULE()
     if(!locationManager) {
       locationManager = [[CLLocationManager alloc] init];
       locationManager.delegate = self;
-    }
-    
-    if(!bluetoothManager) {
-      bluetoothManager = [[CBCentralManager alloc] initWithDelegate:self
-                                                              queue:dispatch_get_main_queue()
-                                                            options:@{
-                                                                      CBCentralManagerOptionShowPowerAlertKey: @0
-                                                                  }];
     }
   }
   
@@ -103,33 +93,6 @@ RCT_EXPORT_MODULE()
     [self sendEventWithName:RN_CONNECTIVITY_STATUS_TOPIC
                        body:event];
   }
-}
-
-// MARK: Bluetooth
-
-- (BOOL)isBluetoothActiveState:(CBManagerState)bluetoothState {
-    switch (bluetoothState) {
-        case CBManagerStatePoweredOn:
-            return YES;
-        default:
-            return NO;
-    }
-}
-
-RCT_EXPORT_METHOD(isBluetoothEnabled:(RCTPromiseResolveBlock) resolve
-                            rejecter:(RCTPromiseRejectBlock) reject)
-{
-    BOOL btIsActive = bluetoothManager && [self isBluetoothActiveState:bluetoothManager.state];
-    resolve(@(btIsActive));
-}
-
-// MARK: CBCentralManager Delegate
-
-- (void)centralManagerDidUpdateState:(CBCentralManager *)central {
-    BOOL centralBtIsActive = central && [self isBluetoothActiveState:central.state];
-  
-    [self sendActiveState:centralBtIsActive
-                forType:@"bluetooth"];
 }
 
 // MARK: Location Permissions
